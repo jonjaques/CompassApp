@@ -4,7 +4,7 @@ module App
   extend self
 
   include CompileVersion
-  VERSION = "1.15"
+  VERSION = "1.15_50below"
   OS = org.jruby.platform.Platform::OS 
   OS_VERSION = java.lang.System.getProperty("os.version")
 
@@ -46,7 +46,7 @@ module App
                                 
     config={
       "show_welcome" => true,
-      "use_version" => 0.12,
+      "use_version" => 0.11,
       "use_specify_gem_path" => false,
       "notifications" => [ :error, :warning ],
       "save_notification_to_file" => true,
@@ -91,21 +91,19 @@ module App
       common_lib_path = File.join(LIB_PATH, "ruby", "compass_common" )
       scan_library( common_lib_path )
 
-      if  App::CONFIG['use_version'] && App::CONFIG['use_version'] < 0.12 
+      if  App::CONFIG['use_version'] && App::CONFIG['use_version'] < 0.11 
         alert("Welcome to use Compass.app v1.13!\nCompass.app is using Compass 0.12 by default. Compass #{App::CONFIG['use_version']} is no longer supported.\nPlease check our site for more information.")
         App::CONFIG['use_version']=0.12
         App.save_config
       end
       
-      compass_gems_path = File.join(LIB_PATH, "ruby", "compass_0.12")
-=begin     
-# can reuse when compass 0.13.beta
-      if App::CONFIG['use_version'] == 0.13
-        compass_gems_path = File.join(LIB_PATH, "ruby", "compass_0.13")
-      else
+
+      if App::CONFIG['use_version'] == 0.12
         compass_gems_path = File.join(LIB_PATH, "ruby", "compass_0.12")
+      else
+        compass_gems_path = File.join(LIB_PATH, "ruby", "compass_0.11")
       end
-=end
+
       scan_library(compass_gems_path)
 
       extensions_gems_path = File.join(LIB_PATH, "ruby", "compass_extensions" )

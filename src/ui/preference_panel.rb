@@ -344,8 +344,13 @@ class PreferencePanel
     rowlayout.spacing = 6;
     button_group.setLayout( rowlayout );
 
+    @button_v11 = Swt::Widgets::Button.new(button_group, Swt::SWT::RADIO )
+    @button_v11.setText("Compass 0.11.7")
+    @button_v11.setSelection( App::CONFIG['use_version'] == 0.11  )
+    @button_v11.addListener(Swt::SWT::Selection, compass_version_button_handler)
+
     @button_v12 = Swt::Widgets::Button.new(button_group, Swt::SWT::RADIO )
-    @button_v12.setText("Default")
+    @button_v12.setText("Compass 0.12.1")
     @button_v12.setSelection( App::CONFIG['use_version'] == 0.12  )
     @button_v12.addListener(Swt::SWT::Selection, compass_version_button_handler)
 

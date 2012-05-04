@@ -47,24 +47,26 @@ module Compass
                 path.create &method(:recompile)
               end
             end
-            Compass.configuration.watches.each do |glob, callback|
-              monitor.path Compass.configuration.project_path do |path|
-                path.glob glob
-                path.update do |base, relative|
-                  puts ">>> Change detected to: #{relative}"
-                  callback.call(base, relative)
-                end
-                path.create do |base, relative|
-                  puts ">>> New file detected: #{relative}"
-                  callback.call(base, relative)
-                end
-                path.delete do |base, relative|
-                  puts ">>> File Removed: #{relative}"
-                  callback.call(base, relative)
+
+            if Compass::VERSION.to_f >= 0.11
+              Compass.configuration.watches.each do |glob, callback|
+                monitor.path Compass.configuration.project_path do |path|
+                  path.glob glob
+                  path.update do |base, relative|
+                    puts ">>> Change detected to: #{relative}"
+                    callback.call(base, relative)
+                  end
+                  path.create do |base, relative|
+                    puts ">>> New file detected: #{relative}"
+                    callback.call(base, relative)
+                  end
+                  path.delete do |base, relative|
+                    puts ">>> File Removed: #{relative}"
+                    callback.call(base, relative)
+                  end
                 end
               end
             end
-
           end
         rescue FSSM::CallbackError => e
           # FSSM catches exit? WTF.
@@ -141,9 +143,13 @@ module Compass
       end 
       duration = options[:time] ? "(#{(css_content.__duration * 1000).round / 1000.0}s)" : ""
       write_file(css_filename, css_content, options.merge(:force => true, :extra => duration))
-     
-      Compass.configuration.run_stylesheet_saved(css_filename)
 
+      if Compass::VERSION.to_f >= 0.12
+        Compass.configuration.run_stylesheet_saved(css_filename)
+      else 
+        Compass.configuration.run_callback(:stylesheet_saved, css_filename )
+      end
+      
       # PATCH: write wordlist File
       sass_filename_str = sass_filename.gsub(/[^a-z0-9]/i, '_')
       File.open( File.join( App::AUTOCOMPLTETE_CACHE_DIR, sass_filename_str + "_project" ), 'w' ) do |f|
